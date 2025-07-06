@@ -16,18 +16,6 @@ const currentTimeRef = document.getElementById('current-time');
 const maxDuration = document.getElementById('max-duration');
 const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-
-playpause.addEventListener("click", function () {
-    if (video.paused) {
-        videoThumbnail.style.display = "none";
-        video.play();
-        playpause.innerHTML = ' <i class="fa-solid fa-pause"></i>';
-    } else {
-        video.pause();
-        playpause.innerHTML = ' <i class="fa-solid fa-play"></i>';
-    }
-});
-
 let isPlaying = false;
 
 function togglePlayPause() {
@@ -42,149 +30,134 @@ function togglePlayPause() {
     isPlaying = !isPlaying;
 }
 
-document.addEventListener("keydown", function (event) {
-    if (event.key == " " || event.keyCode === 32) {
-        event.preventDefault();
-        togglePlayPause();
-    }
-});
+playpause.addEventListener("click", togglePlayPause);
 
-video.addEventListener("play", function () {
-    isPlaying = true;
-});
-
-video.addEventListener("pause", function () {
-    isPlaying = false;
-});
-
-video.addEventListener("ended", function () {
-    playpause.innerHTML = '<i class="fa-solid fa-play"></i>';
-});
-
-// ⏩/⏪
-frwd.addEventListener('click', function () {
-    video.currentTime += 5;
-});
-
-bkwrd.addEventListener('click', function () {
-    video.currentTime -= 5;
-});
-
-// 🔇 Mute / Unmute
-mutebtn.addEventListener("click", function () {
-    if (video.muted) {
-        video.muted = false;
-        mutebtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-        volume.value = video.volume;
-    } else {
-        video.muted = true;
-        mutebtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
-        volume.value = 0;
-    }
-    updateVolumeBackground(); // ✅ update bar color
-});
-
-// 🔇 M / m key
-document.addEventListener("keydown", function (event) {
-    if (event.key === "m" || event.key === "M") {
-        event.preventDefault();
-
-        if (video.muted) {
-            video.muted = false;
-            mutebtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-            volume.value = video.volume;
-        } else {
-            video.muted = true;
-            mutebtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
-            volume.value = 0;
-        }
-        updateVolumeBackground(); // ✅ update bar color
-    }
-});
-
-// 🔊 Volume change
-volume.addEventListener("input", function () {
-    video.volume = volume.value;
-
-    if (video.volume == 0) {
-        mutebtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
-    } else {
-        video.muted = false; // unmute if user changes volume
-        mutebtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-    }
-
-    updateVolumeBackground();
-});
-
-// ⬆️ Hover to show/hide controls
-videoContainer.addEventListener("mouseenter", () => {
-    controls.style.opacity = 1;
-});
-
-videoContainer.addEventListener("mouseleave", () => {
-    if (!isPlaying) return;
-    controls.style.opacity = 0;
-});
-
-// 🕒 Progress bar update
-video.addEventListener("timeupdate", () => {
-    const currentTime = video.currentTime;
-    const duration = video.duration;
-    const percentage = (currentTime / duration) * 100;
-    progressBar.style.width = percentage + "%";
-});
-
-// 📸 Show thumbnail at end
-function showThumbnail() {
-    videoThumbnail.style.display = "block";
-}
+video.addEventListener("play", () => isPlaying = true);
+video.addEventListener("pause", () => isPlaying = false);
 
 video.addEventListener("ended", () => {
+    playpause.innerHTML = '<i class="fa-solid fa-play"></i>';
     progressBar.style.width = "0%";
     showThumbnail();
 });
 
-// ⏱️ Format time
-const timeFormatter = (timeInput) => {
+frwd.addEventListener("click", () => video.currentTime += 5);
+bkwrd.addEventListener("click", () => video.currentTime -= 5);
+
+mutebtn.addEventListener("click", () => {
+    video.muted = !video.muted;
+    if (video.muted) {
+        mutebtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+        volume.value = 0;
+    } else {
+        mutebtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+        volume.value = video.volume;
+    }
+    updateVolumeBackground();
+});
+
+volume.addEventListener("input", () => {
+    video.volume = volume.value;
+    if (video.volume == 0) {
+        video.muted = true;
+        mutebtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+    } else {
+        video.muted = false;
+        mutebtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    }
+    updateVolumeBackground();
+});
+
+function updateVolumeBackground() {
+    const value = (volume.value - volume.min) / (volume.max - volume.min) * 100;
+    volume.style.setProperty('--value', `${value}%`);
+}
+updateVolumeBackground();
+
+videoContainer.addEventListener("mouseenter", () => controls.style.opacity = 1);
+videoContainer.addEventListener("mouseleave", () => {
+    if (isPlaying) controls.style.opacity = 0;
+});
+
+video.addEventListener("timeupdate", () => {
+    const currentTime = video.currentTime;
+    const duration = video.duration;
+    const percentage = (currentTime / duration) * 100;
+    progressBar.style.width = `${percentage}%`;
+});
+
+function timeFormatter(timeInput) {
     let minute = Math.floor(timeInput / 60);
-    minute = minute < 10 ? "0" + minute : minute;
-
     let second = Math.floor(timeInput % 60);
-    second = second < 10 ? "0" + second : second;
+    return `${minute < 10 ? "0" + minute : minute}:${second < 10 ? "0" + second : second}`;
+}
 
-    return `${minute}:${second}`;
-};
-
-// ⏱️ Timer update
 setInterval(() => {
     currentTimeRef.innerHTML = timeFormatter(video.currentTime);
     maxDuration.innerHTML = timeFormatter(video.duration);
 }, 500);
 
-// ⏩ Click timeline
 playbackline.addEventListener("click", (e) => {
-    let timelineWidth = playbackline.clientWidth;
+    const timelineWidth = playbackline.clientWidth;
     video.currentTime = (e.offsetX / timelineWidth) * video.duration;
 });
 
-// 🎚️ Update volume background
-function updateVolumeBackground() {
-    const value = (volume.value - volume.min) / (volume.max - volume.min) * 100;
-    volume.style.setProperty('--value', `${value}%`);
-}
-
-volume.addEventListener('input', updateVolumeBackground);
-updateVolumeBackground(); // initial
-
-// 🖥️ Fullscreen
 fullscreenBtn.addEventListener("click", () => {
     if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen().catch((err) => {
-            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        videoContainer.requestFullscreen().catch(err => {
+            alert(`Error enabling fullscreen: ${err.message}`);
         });
-        fullscreenBtn.innerHTML = ' <i class="fa-solid fa-compress"></i>';
+        fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress"></i>';
     } else {
         document.exitFullscreen();
-        fullscreenBtn.innerHTML = ' <i class="fa-solid fa-expand"></i>';
+        fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+    }
+});
+
+function showThumbnail() {
+    videoThumbnail.style.display = "block";
+}
+
+// 🎯 Global key shortcuts
+document.addEventListener("keydown", function (event) {
+    const key = event.key.toLowerCase();
+
+    switch (key) {
+        case " ":
+            event.preventDefault();
+            togglePlayPause();
+            break;
+        case "m":
+            event.preventDefault();
+            video.muted = !video.muted;
+            if (video.muted) {
+                mutebtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+                volume.value = 0;
+            } else {
+                mutebtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                volume.value = video.volume;
+            }
+            updateVolumeBackground();
+            break;
+        case "arrowright":
+            event.preventDefault();
+            video.currentTime += 5;
+            break;
+        case "arrowleft":
+            event.preventDefault();
+            video.currentTime -= 5;
+            break;
+        case "f":
+            event.preventDefault();
+            if (!document.fullscreenElement) {
+                videoContainer.requestFullscreen().catch(err => {
+                    alert(`Error enabling fullscreen: ${err.message}`);
+                });
+                fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress"></i>';
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+            }
+            break;
     }
 });
