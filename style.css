@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.fullpage {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+
+    grid-template-areas:
+        "navbar navbar navbar navbar"
+        "videoContainer videoContainer videoContainer suggestions"
+        "comments comments comments suggestions"
+    ;
+    gap: 10px;
+}
+
+.navbar {
+    grid-area: navbar;
+    background-color: lightgray;
+    height: 50px;
+}
+
+.videoContainer {
+    grid-area: videoContainer;
+    background-color: black;
+    height: 70vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.suggestions {
+    grid-area: suggestions;
+    background-color: lightgreen;
+}
+
+.comments {
+    grid-area: comments;
+    background-color: lightcoral;
+    height: 500px;
+}
+
+
+
+
+#video-thumbnail {
+    position: absolute;
+    max-width: 100%;
+    height: 100%;
+}
+
+
+.controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+
+.controls .control-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+
+.controls .control-buttons button {
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
+}
+
+.controls .control-buttons #play-pause {
+    font-size: 30px;
+}
+
+
+.controls .video-timer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    font-size: 12px;
+}
+
+
+.controls #separator {
+    margin: 0 5px;
+    font-size: 16px;
+    font-family: "Open sans";
+
+}
+
+
+
+.playback-line {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    background-color: lightgray;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 20px;
+}
+
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background-color: red;
+    transition: width 0.1s linear;
+    border-radius: 5px;
+    position: relative;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+    transition: right 0.1s linear;
+}
+
+
+.controls .fa-volume-up,
+.controls .fa-solid {
+    padding: 5px;
+    color: white;
+}
+
+
+.controls input {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+
+.right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.volume-container{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+#volume {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(to right, red 0%, red var(--value), lightgray var(--value), lightgray 100%);
+    border-radius: 5px;
+    outline: none;
+}
+
+
+#volume::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+}
+
+
+#volume::-moz-range-thumb{
+  
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+    cursor: pointer;
+   
+}
+
+
+#volume::-ms-thumb{
+  
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+    cursor: pointer;
+   
+}
+
+
+#volume::-moz-range-track{
+    background: transparent;
+}
+
+#volume::-ms-track{
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+
+#mute{
+    cursor: pointer;
+}
+
+#fullscreen-btn{
+    cursor: pointer;
+}
