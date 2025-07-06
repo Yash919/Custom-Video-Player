@@ -36,9 +36,12 @@ video.addEventListener("play", () => isPlaying = true);
 video.addEventListener("pause", () => isPlaying = false);
 
 video.addEventListener("ended", () => {
-    playpause.innerHTML = '<i class="fa-solid fa-play"></i>';
+    video.currentTime = 0; // Reset time
     progressBar.style.width = "0%";
+    currentTimeRef.innerHTML = timeFormatter(0); // Display 00:00
     showThumbnail();
+    playpause.innerHTML = '<i class="fa-solid fa-play"></i>';
+    isPlaying = false;
 });
 
 frwd.addEventListener("click", () => video.currentTime += 5);
